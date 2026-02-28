@@ -13,16 +13,21 @@ enum OnboardingStep {
 final class OnboardingViewModel {
     var currentStep: OnboardingStep = .welcome
     var vinText = ""
-    var make = ""
+    var make = "" {
+        didSet {
+            if oldValue != make { model = "" }
+        }
+    }
     var model = ""
     var year = Calendar.current.component(.year, from: Date())
     var trim = ""
+    var nickname = ""
     var isValidatingVIN = false
     var vinValidationError: String?
     var decodedVINInfo: VINInfo?
 
-    var isVINValid: Bool {
-        vinText.count == 17 && VINDecoderService.validate(vinText) == .valid
+    var canDecodeVIN: Bool {
+        vinText.count == 17
     }
 
     var canAddVehicle: Bool {
@@ -53,12 +58,14 @@ final class OnboardingViewModel {
     }
 
     func createVehicle(in context: ModelContext) -> Vehicle {
+        let trimmedNickname = nickname.trimmingCharacters(in: .whitespaces)
         let vehicle = Vehicle(
             make: make.trimmingCharacters(in: .whitespaces),
             model: model.trimmingCharacters(in: .whitespaces),
             year: year,
             vin: vinText.isEmpty ? nil : vinText.uppercased(),
-            trim: trim.trimmingCharacters(in: .whitespaces).isEmpty ? nil : trim.trimmingCharacters(in: .whitespaces)
+            trim: trim.trimmingCharacters(in: .whitespaces).isEmpty ? nil : trim.trimmingCharacters(in: .whitespaces),
+            nickname: trimmedNickname.isEmpty ? nil : trimmedNickname
         )
         context.insert(vehicle)
         return vehicle

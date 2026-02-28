@@ -55,11 +55,11 @@ struct VINEntryView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(viewModel.isVINValid ? Color.appAccent : Color.gray)
+                .background(viewModel.canDecodeVIN ? Color.appAccent : Color.gray)
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .disabled(!viewModel.isVINValid || viewModel.isValidatingVIN)
+            .disabled(!viewModel.canDecodeVIN || viewModel.isValidatingVIN)
 
             Button("Enter make & model instead") {
                 viewModel.currentStep = .makeModelEntry

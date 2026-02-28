@@ -53,14 +53,37 @@ struct ChatView: View {
             .safeAreaInset(edge: .bottom) {
                 inputBar
             }
-            .navigationTitle(vehicle.displayName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         state.showGarage = true
                     } label: {
-                        Image(systemName: "car.2.fill")
+                        Image(systemName: "line.3.horizontal")
+                            .font(.body)
+                            .frame(width: 34, height: 34)
+                            .background(Color(.systemGray5))
+                            .clipShape(Circle())
+                    }
+                }
+
+                ToolbarItem(placement: .principal) {
+                    Button {
+                        state.showGarage = true
+                    } label: {
+                        VStack(spacing: 2) {
+                            HStack(spacing: 4) {
+                                Text(vehicle.topBarName)
+                                    .font(.headline)
+                                    .foregroundStyle(Color.primary)
+                                Image(systemName: "chevron.down")
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+                            Text(vehicle.displayName)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
 
@@ -68,7 +91,11 @@ struct ChatView: View {
                     Button {
                         state.showSettings = true
                     } label: {
-                        Image(systemName: "gearshape")
+                        Image(systemName: "car.fill")
+                            .font(.body)
+                            .frame(width: 34, height: 34)
+                            .background(Color(.systemGray5))
+                            .clipShape(Circle())
                     }
                 }
             }

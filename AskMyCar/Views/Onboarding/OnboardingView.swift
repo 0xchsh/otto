@@ -109,6 +109,9 @@ struct OnboardingView: View {
                     if !viewModel.trim.isEmpty {
                         infoRow(label: "Trim", value: viewModel.trim)
                     }
+                    if !viewModel.nickname.trimmingCharacters(in: .whitespaces).isEmpty {
+                        infoRow(label: "Nickname", value: viewModel.nickname)
+                    }
                 }
 
                 if let info = viewModel.decodedVINInfo {

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -33,6 +33,7 @@
 		CAFD3DB86D245B072702F156 /* LoadingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4869AF465038BE45FED015CB /* LoadingIndicator.swift */; };
 		D2C815DFF01C4E7F4F9231F5 /* View+Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F81211E49D131E9C4B330D3 /* View+Keyboard.swift */; };
 		DC9D13991980859E022763DD /* MakeModelEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF72F6F9CF7DB34542B76AB /* MakeModelEntryView.swift */; };
+		F1E2D3C4B5A6F7E8D9C0B1A2 /* VehicleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* VehicleData.swift */; };
 		FD5A13BA3CFF2E0B28EF00DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C162E7F55D6935D5901C2EF /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
@@ -51,10 +52,11 @@
 		516832DC2B2ED6DBC0D92A8A /* AskMyCarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskMyCarApp.swift; sourceTree = "<group>"; };
 		55C2DE58906601A579A47939 /* VehicleAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleAPIService.swift; sourceTree = "<group>"; };
 		5A2EB49E094458756BD59FBC /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
-		5B476EE16C0AF316B7971683 /* AskMyCar.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AskMyCar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B476EE16C0AF316B7971683 /* AskMyCar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AskMyCar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		61036A7E9F386782BE05FB14 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		7B64B680BAE7E0C7EB2EC086 /* Vehicle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vehicle.swift; sourceTree = "<group>"; };
 		9C162E7F55D6935D5901C2EF /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* VehicleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleData.swift; sourceTree = "<group>"; };
 		A30AC50A4DE8E9241992007F /* GarageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageView.swift; sourceTree = "<group>"; };
 		AAF36ED99D309AB011DA3176 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		B487DA125941D3CE9A474F72 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 				AAF36ED99D309AB011DA3176 /* ChatMessage.swift */,
 				E692655BDADB5019AE4B9279 /* ChatSession.swift */,
 				7B64B680BAE7E0C7EB2EC086 /* Vehicle.swift */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* VehicleData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -242,7 +245,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2630;
 			};
 			buildConfigurationList = 3200364E58789B6E5D3F7767 /* Build configuration list for PBXProject "AskMyCar" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -254,7 +257,6 @@
 			);
 			mainGroup = 2C6B4EE793D2845947294F54;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -302,6 +304,7 @@
 				2C2173F7CB8981437A5765A2 /* VINDecoderService.swift in Sources */,
 				1D347396BE008EB90057CFA3 /* VINEntryView.swift in Sources */,
 				9BA78A1B1B26DFFD7777B3C2 /* Vehicle.swift in Sources */,
+				F1E2D3C4B5A6F7E8D9C0B1A2 /* VehicleData.swift in Sources */,
 				61F290FE41A2BD6EBBA2CC37 /* VehicleAPIService.swift in Sources */,
 				B79F59A4FCA19271F26E0146 /* VehicleCard.swift in Sources */,
 				D2C815DFF01C4E7F4F9231F5 /* View+Keyboard.swift in Sources */,
@@ -375,6 +378,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -395,6 +399,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;
@@ -438,6 +443,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -451,6 +457,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;

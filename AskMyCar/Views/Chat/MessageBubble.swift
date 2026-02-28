@@ -5,11 +5,18 @@ struct MessageBubble: View {
 
     private var isUser: Bool { message.role == .user }
 
+    private var formattedContent: Text {
+        if let attributed = try? AttributedString(markdown: message.content, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
+            return Text(attributed)
+        }
+        return Text(message.content)
+    }
+
     var body: some View {
         HStack {
             if isUser { Spacer(minLength: 60) }
 
-            Text(message.content)
+            formattedContent
                 .padding(12)
                 .background(isUser ? Color.userBubble : Color.assistantBubble)
                 .foregroundStyle(isUser ? .white : Color.appPrimaryText)
