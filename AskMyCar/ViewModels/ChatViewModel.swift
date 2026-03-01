@@ -1,11 +1,13 @@
 import Foundation
 import SwiftData
+import UIKit
 
 @Observable
 @MainActor
 final class ChatViewModel {
     var messages: [ChatMessage] = []
     var inputText = ""
+    var selectedImages: [UIImage] = []
     var isLoading = false
     var isStreaming = false
     var errorMessage: String?
@@ -60,15 +62,25 @@ final class ChatViewModel {
         }
     }
 
+    func removeImage(at index: Int) {
+        guard selectedImages.indices.contains(index) else { return }
+        selectedImages.remove(at: index)
+    }
+
     func sendMessage(in context: ModelContext) {
         guard let session = currentSession, let vehicle = session.vehicle else { return }
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
+        guard !text.isEmpty || !selectedImages.isEmpty else { return }
 
+        // Compress selected images to JPEG
+        let imageDataArray: [Data]? = selectedImages.isEmpty ? nil : selectedImages.compactMap {
+            $0.jpegData(compressionQuality: 0.7)
+        }
         inputText = ""
+        selectedImages = []
         errorMessage = nil
 
-        let userMessage = ChatMessage(role: .user, content: text)
+        let userMessage = ChatMessage(role: .user, content: text, imageData: imageDataArray)
         userMessage.session = currentSession
         context.insert(userMessage)
         messages.append(userMessage)
@@ -98,7 +110,7 @@ final class ChatViewModel {
 
         for msg in messages where msg.role != .system {
             if msg.id == assistantMessage.id { continue }
-            aiMessages.append(AIMessage(role: msg.role.rawValue, content: msg.content))
+            aiMessages.append(AIMessage(role: msg.role.rawValue, content: msg.content, images: msg.imageData))
         }
 
         streamTask = Task {

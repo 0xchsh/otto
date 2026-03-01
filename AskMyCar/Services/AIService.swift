@@ -18,9 +18,33 @@ enum AIServiceError: LocalizedError {
     }
 }
 
-struct AIMessage: Codable {
+struct AIMessage {
     let role: String
     let content: String
+    var images: [Data]?
+
+    init(role: String, content: String, images: [Data]? = nil) {
+        self.role = role
+        self.content = content
+        self.images = images
+    }
+
+    func toDict() -> [String: Any] {
+        if let images, !images.isEmpty {
+            var contentArray: [[String: Any]] = [
+                ["type": "text", "text": content]
+            ]
+            for imageData in images {
+                let base64 = imageData.base64EncodedString()
+                contentArray.append([
+                    "type": "image_url",
+                    "image_url": ["url": "data:image/jpeg;base64,\(base64)"]
+                ])
+            }
+            return ["role": role, "content": contentArray]
+        }
+        return ["role": role, "content": content]
+    }
 }
 
 actor AIService {
@@ -64,7 +88,7 @@ actor AIService {
 
                     let body: [String: Any] = [
                         "model": model,
-                        "messages": messages.map { ["role": $0.role, "content": $0.content] },
+                        "messages": messages.map { $0.toDict() },
                         "stream": true
                     ]
                     request.httpBody = try JSONSerialization.data(withJSONObject: body)

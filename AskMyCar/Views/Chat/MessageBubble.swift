@@ -12,15 +12,38 @@ struct MessageBubble: View {
         return Text(message.content)
     }
 
+    private var hasImages: Bool {
+        guard let imageData = message.imageData else { return false }
+        return !imageData.isEmpty
+    }
+
     var body: some View {
         HStack {
             if isUser { Spacer(minLength: 60) }
 
-            formattedContent
-                .padding(12)
-                .background(isUser ? Color.userBubble : Color.assistantBubble)
-                .foregroundStyle(isUser ? .white : Color.appPrimaryText)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+            VStack(alignment: isUser ? .trailing : .leading, spacing: 6) {
+                if hasImages, let imageDataArray = message.imageData {
+                    HStack(spacing: 6) {
+                        ForEach(Array(imageDataArray.enumerated()), id: \.offset) { _, data in
+                            if let uiImage = UIImage(data: data) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 120, height: 120)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+                    }
+                }
+
+                if !message.content.isEmpty {
+                    formattedContent
+                        .padding(12)
+                        .background(isUser ? Color.userBubble : Color.assistantBubble)
+                        .foregroundStyle(isUser ? .white : Color.appPrimaryText)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+            }
 
             if !isUser { Spacer(minLength: 60) }
         }

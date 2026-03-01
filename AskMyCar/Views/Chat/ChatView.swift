@@ -1,10 +1,13 @@
 import SwiftUI
 import SwiftData
+import PhotosUI
 
 struct ChatView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = ChatViewModel()
+    @State private var photoPickerItems: [PhotosPickerItem] = []
+    @State private var showCamera = false
     @FocusState private var isInputFocused: Bool
 
     private var session: ChatSession? { appState.activeSession }
@@ -148,6 +151,84 @@ struct ChatView: View {
         ]
     }
 
+    private var canSend: Bool {
+        !viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !viewModel.selectedImages.isEmpty
+    }
+
+    private var imageThumbnails: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(Array(viewModel.selectedImages.enumerated()), id: \.offset) { index, image in
+                    ZStack(alignment: .topTrailing) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 60, height: 60)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                        Button {
+                            withAnimation { viewModel.removeImage(at: index) }
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(.white)
+                                .background(Circle().fill(.black.opacity(0.5)))
+                        }
+                        .offset(x: 4, y: -4)
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
+        }
+    }
+
+    private var attachmentMenu: some View {
+        Menu {
+            PhotosPicker(
+                selection: $photoPickerItems,
+                maxSelectionCount: 5,
+                matching: .images
+            ) {
+                Label("Photo Library", systemImage: "photo.on.rectangle")
+            }
+
+            Button {
+                showCamera = true
+            } label: {
+                Label("Camera", systemImage: "camera")
+            }
+        } label: {
+            Image(systemName: "plus")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(Color.appSecondaryText)
+                .frame(width: 32, height: 32)
+        }
+    }
+
+    private var sendOrStopButton: some View {
+        Group {
+            if viewModel.isStreaming {
+                Button {
+                    viewModel.stopStreaming()
+                } label: {
+                    Image(systemName: "stop.circle.fill")
+                        .font(.system(size: 28))
+                        .foregroundStyle(Color.red)
+                }
+            } else {
+                Button {
+                    sendMessage()
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 28))
+                        .foregroundStyle(canSend ? Color.appAccent : Color.gray.opacity(0.4))
+                }
+                .disabled(!canSend)
+            }
+        }
+    }
+
     private var inputBar: some View {
         VStack(spacing: 0) {
             if viewModel.messages.isEmpty {
@@ -173,46 +254,52 @@ struct ChatView: View {
                 .padding(.vertical, 8)
             }
 
-            HStack(spacing: 12) {
-                TextField(
-                    vehicle.map { "Ask a question about your \($0.make)" } ?? "Ask about your car...",
-                    text: $viewModel.inputText,
-                    axis: .vertical
-                )
+            VStack(spacing: 8) {
+                if !viewModel.selectedImages.isEmpty {
+                    imageThumbnails
+                }
+
+                HStack(alignment: .bottom, spacing: 8) {
+                    attachmentMenu
+
+                    TextField(
+                        vehicle.map { "Ask about your \($0.make)..." } ?? "Ask about your car...",
+                        text: $viewModel.inputText,
+                        axis: .vertical
+                    )
                     .textFieldStyle(.plain)
                     .lineLimit(1...5)
                     .focused($isInputFocused)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.appSecondaryBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
 
-                if viewModel.isStreaming {
-                    Button {
-                        viewModel.stopStreaming()
-                    } label: {
-                        Image(systemName: "stop.circle.fill")
-                            .font(.system(size: 34))
-                            .foregroundStyle(Color.red)
-                    }
-                } else {
-                    Button {
-                        sendMessage()
-                    } label: {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 34))
-                            .foregroundStyle(
-                                viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                                ? Color.gray : Color.appAccent
-                            )
-                    }
-                    .disabled(viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    sendOrStopButton
                 }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 8)
+                .padding(.top, viewModel.selectedImages.isEmpty ? 8 : 0)
             }
+            .background(Color.appSecondaryBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
         .background(.bar)
+        .onChange(of: photoPickerItems) { _, newItems in
+            Task {
+                for item in newItems {
+                    if let data = try? await item.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        viewModel.selectedImages.append(uiImage)
+                    }
+                }
+                photoPickerItems = []
+            }
+        }
+        .fullScreenCover(isPresented: $showCamera) {
+            CameraPickerView { image in
+                viewModel.selectedImages.append(image)
+            }
+            .ignoresSafeArea()
+        }
     }
 
     private func sendMessage() {
