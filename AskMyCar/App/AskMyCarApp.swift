@@ -34,6 +34,10 @@ struct ContentView: View {
                     let sidebarWidth = geo.size.width * sidebarFraction
 
                     ZStack(alignment: .leading) {
+                        // Full-bleed background matching sidebar
+                        Color.appBackground
+                            .ignoresSafeArea()
+
                         // Sidebar — sits behind, revealed when main content pushes right
                         ChatHistoryView()
                             .frame(width: sidebarWidth)
@@ -69,19 +73,20 @@ struct ContentView: View {
 
     @ViewBuilder
     private func mainContent(geo: GeometryProxy, sidebarWidth: CGFloat) -> some View {
+        let isOpen = appState.showSidebar
+
         NavigationStack {
             ChatView()
         }
-        .frame(width: geo.size.width, height: geo.size.height)
+        .frame(width: geo.size.width)
+        .clipShape(RoundedRectangle(cornerRadius: isOpen ? 20 : 0, style: .continuous))
+        .shadow(color: .black.opacity(isOpen ? 0.15 : 0), radius: 10, x: -3)
         .offset(x: mainOffset(sidebarWidth: sidebarWidth))
-        .scaleEffect(appState.showSidebar ? 0.93 : 1.0)
-        .clipShape(RoundedRectangle(cornerRadius: appState.showSidebar ? 20 : 0))
-        .shadow(color: .black.opacity(appState.showSidebar ? 0.12 : 0), radius: 12, x: -4)
         .overlay {
-            if appState.showSidebar {
-                Color.black.opacity(0.05)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .contentShape(Rectangle())
+            if isOpen {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color.black.opacity(0.04))
+                    .allowsHitTesting(true)
                     .onTapGesture {
                         withAnimation(springAnimation) {
                             appState.showSidebar = false
