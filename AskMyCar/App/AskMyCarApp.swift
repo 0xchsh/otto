@@ -20,23 +20,30 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Vehicle.createdAt) private var vehicles: [Vehicle]
 
-    var body: some View {
-        @Bindable var state = appState
+    @State private var dragOffset: CGFloat = 0
+    private let sidebarFraction: CGFloat = 0.82
 
+    private let springAnimation = Animation.spring(response: 0.35, dampingFraction: 0.85)
+
+    var body: some View {
         Group {
             if vehicles.isEmpty {
                 OnboardingView()
             } else {
-                ZStack {
-                    NavigationStack {
-                        ChatView()
-                    }
+                GeometryReader { geo in
+                    let sidebarWidth = geo.size.width * sidebarFraction
 
-                    SidebarOverlay(isOpen: $state.showSidebar) {
+                    ZStack(alignment: .leading) {
+                        // Sidebar — sits behind, revealed when main content pushes right
                         ChatHistoryView()
+                            .frame(width: sidebarWidth)
+
+                        // Main content — pushes right when sidebar opens
+                        mainContent(geo: geo, sidebarWidth: sidebarWidth)
                     }
+                    .gesture(sidebarDragGesture(sidebarWidth: sidebarWidth))
                 }
-                .gesture(edgeSwipeGesture)
+                .ignoresSafeArea(.keyboard)
             }
         }
         .onAppear {
@@ -45,7 +52,6 @@ struct ContentView: View {
             }
         }
         .onChange(of: vehicles.count) { oldCount, newCount in
-            // First vehicle just added via onboarding
             if oldCount == 0 && newCount > 0 {
                 let vehicle = vehicles.first(where: { $0.isActive }) ?? vehicles.first
                 appState.activeVehicle = vehicle
@@ -61,17 +67,66 @@ struct ContentView: View {
         }
     }
 
-    private var edgeSwipeGesture: some Gesture {
+    @ViewBuilder
+    private func mainContent(geo: GeometryProxy, sidebarWidth: CGFloat) -> some View {
+        NavigationStack {
+            ChatView()
+        }
+        .frame(width: geo.size.width, height: geo.size.height)
+        .offset(x: mainOffset(sidebarWidth: sidebarWidth))
+        .scaleEffect(appState.showSidebar ? 0.93 : 1.0)
+        .clipShape(RoundedRectangle(cornerRadius: appState.showSidebar ? 20 : 0))
+        .shadow(color: .black.opacity(appState.showSidebar ? 0.12 : 0), radius: 12, x: -4)
+        .overlay {
+            if appState.showSidebar {
+                Color.black.opacity(0.05)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation(springAnimation) {
+                            appState.showSidebar = false
+                        }
+                    }
+            }
+        }
+        .animation(springAnimation, value: appState.showSidebar)
+    }
+
+    private func mainOffset(sidebarWidth: CGFloat) -> CGFloat {
+        if appState.showSidebar {
+            return sidebarWidth + min(dragOffset, 0)
+        } else {
+            return max(dragOffset, 0)
+        }
+    }
+
+    private func sidebarDragGesture(sidebarWidth: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 20)
-            .onEnded { value in
-                // Open sidebar on right-swipe from left edge
-                if value.startLocation.x < 30 &&
-                   value.translation.width > 60 &&
-                   !appState.showSidebar {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                        appState.showSidebar = true
+            .onChanged { value in
+                if appState.showSidebar {
+                    // Drag left to close
+                    if value.translation.width < 0 {
+                        dragOffset = value.translation.width
+                    }
+                } else {
+                    // Drag right from left edge to open
+                    if value.startLocation.x < 30 && value.translation.width > 0 {
+                        dragOffset = value.translation.width
                     }
                 }
+            }
+            .onEnded { value in
+                if appState.showSidebar {
+                    if value.translation.width < -80 || value.predictedEndTranslation.width < -120 {
+                        withAnimation(springAnimation) { appState.showSidebar = false }
+                    }
+                } else {
+                    if value.startLocation.x < 30 &&
+                       (value.translation.width > 80 || value.predictedEndTranslation.width > 120) {
+                        withAnimation(springAnimation) { appState.showSidebar = true }
+                    }
+                }
+                withAnimation(springAnimation) { dragOffset = 0 }
             }
     }
 }
