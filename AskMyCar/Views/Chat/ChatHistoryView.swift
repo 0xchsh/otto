@@ -7,73 +7,153 @@ struct ChatHistoryView: View {
     @Query(sort: \ChatSession.updatedAt, order: .reverse) private var sessions: [ChatSession]
     @State private var showSettings = false
 
+    private var groupedSessions: [(String, [ChatSession])] {
+        let calendar = Calendar.current
+        let now = Date()
+
+        var today: [ChatSession] = []
+        var yesterday: [ChatSession] = []
+        var previous7Days: [ChatSession] = []
+        var previous30Days: [ChatSession] = []
+        var older: [ChatSession] = []
+
+        for session in sessions {
+            if calendar.isDateInToday(session.updatedAt) {
+                today.append(session)
+            } else if calendar.isDateInYesterday(session.updatedAt) {
+                yesterday.append(session)
+            } else if let days = calendar.dateComponents([.day], from: session.updatedAt, to: now).day, days < 7 {
+                previous7Days.append(session)
+            } else if let days = calendar.dateComponents([.day], from: session.updatedAt, to: now).day, days < 30 {
+                previous30Days.append(session)
+            } else {
+                older.append(session)
+            }
+        }
+
+        var result: [(String, [ChatSession])] = []
+        if !today.isEmpty { result.append(("Today", today)) }
+        if !yesterday.isEmpty { result.append(("Yesterday", yesterday)) }
+        if !previous7Days.isEmpty { result.append(("Previous 7 Days", previous7Days)) }
+        if !previous30Days.isEmpty { result.append(("Previous 30 Days", previous30Days)) }
+        if !older.isEmpty { result.append(("Older", older)) }
+        return result
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            // Header
+            // Large title
             HStack {
                 Text("AskMyCar")
-                    .font(.title2.bold())
-
+                    .font(.largeTitle.bold())
                 Spacer()
-
-                Button {
-                    createNewSession()
-                } label: {
-                    Image(systemName: "square.and.pencil")
-                        .font(.title3)
-                }
-
-                Button {
-                    showSettings = true
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.title3)
-                }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 20)
             .padding(.top, 16)
-            .padding(.bottom, 12)
-
-            Divider()
+            .padding(.bottom, 20)
 
             // Session list
             if sessions.isEmpty {
-                Spacer()
-                VStack(spacing: 12) {
-                    Image(systemName: "bubble.left.and.bubble.right")
-                        .font(.system(size: 36))
-                        .foregroundStyle(.secondary)
-                    Text("No Conversations")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                    Text("Tap + to start a new chat")
-                        .font(.subheadline)
-                        .foregroundStyle(.tertiary)
-                }
-                Spacer()
+                emptyState
             } else {
-                List {
-                    ForEach(sessions, id: \.id) { session in
-                        Button {
-                            selectSession(session)
-                        } label: {
-                            ChatHistoryRow(session: session)
-                        }
-                        .tint(.primary)
-                        .listRowBackground(
-                            session.id == appState.activeSession?.id
-                            ? Color.appAccent.opacity(0.12)
-                            : Color.clear
-                        )
-                    }
-                    .onDelete(perform: deleteSessions)
-                }
-                .listStyle(.plain)
+                sessionList
             }
+
+            Spacer(minLength: 0)
+
+            // Bottom bar
+            bottomBar
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()
         }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Spacer()
+            Image(systemName: "bubble.left.and.bubble.right")
+                .font(.system(size: 36))
+                .foregroundStyle(.secondary)
+            Text("No Conversations")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+            Text("Tap + to start a new chat")
+                .font(.subheadline)
+                .foregroundStyle(.tertiary)
+            Spacer()
+        }
+    }
+
+    private var sessionList: some View {
+        ScrollView(showsIndicators: false) {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(groupedSessions, id: \.0) { sectionTitle, sectionSessions in
+                    Text(sectionTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.appAccent)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+                        .padding(.bottom, 6)
+
+                    ForEach(sectionSessions, id: \.id) { session in
+                        Button {
+                            selectSession(session)
+                        } label: {
+                            ChatHistoryRow(
+                                session: session,
+                                isActive: session.id == appState.activeSession?.id
+                            )
+                        }
+                        .padding(.horizontal, 8)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                deleteSession(session)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.bottom, 8)
+        }
+    }
+
+    private var bottomBar: some View {
+        HStack {
+            Button {
+                showSettings = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.appSecondaryText)
+                        .frame(width: 34, height: 34)
+                        .background(Color.appSecondaryBackground)
+                        .clipShape(Circle())
+
+                    Text("Settings")
+                        .font(.subheadline)
+                        .foregroundStyle(Color.appPrimaryText)
+                }
+            }
+
+            Spacer()
+
+            Button {
+                createNewSession()
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .background(Color.appAccent)
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
     }
 
     private func selectSession(_ session: ChatSession) {
@@ -93,14 +173,11 @@ struct ChatHistoryView: View {
         }
     }
 
-    private func deleteSessions(at offsets: IndexSet) {
-        for index in offsets {
-            let session = sessions[index]
-            let wasActive = session.id == appState.activeSession?.id
-            modelContext.delete(session)
-            if wasActive {
-                appState.activeSession = sessions.first(where: { $0.id != session.id })
-            }
+    private func deleteSession(_ session: ChatSession) {
+        let wasActive = session.id == appState.activeSession?.id
+        modelContext.delete(session)
+        if wasActive {
+            appState.activeSession = sessions.first(where: { $0.id != session.id })
         }
     }
 }
