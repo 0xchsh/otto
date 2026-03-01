@@ -134,7 +134,7 @@ struct OnboardingView: View {
                 // Create a new chat session for this vehicle
                 let session = ChatSession(title: "New Chat", vehicle: vehicle)
                 modelContext.insert(session)
-                appState.navigationPath = [session]
+                appState.activeSession = session
 
                 // Dismiss sheets (garage + onboarding) when adding from garage
                 appState.showGarage = false

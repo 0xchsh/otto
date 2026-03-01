@@ -67,8 +67,8 @@ struct GarageView: View {
         let session = ChatSession(title: "New Chat", vehicle: vehicle)
         modelContext.insert(session)
 
-        // Navigate to the new session
-        appState.navigationPath = [session]
+        // Load the new session
+        appState.activeSession = session
         dismiss()
     }
 

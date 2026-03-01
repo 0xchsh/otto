@@ -27,12 +27,16 @@ struct ContentView: View {
             if vehicles.isEmpty {
                 OnboardingView()
             } else {
-                NavigationStack(path: $state.navigationPath) {
-                    ChatHistoryView()
-                        .navigationDestination(for: ChatSession.self) { session in
-                            ChatView(session: session)
-                        }
+                ZStack {
+                    NavigationStack {
+                        ChatView()
+                    }
+
+                    SidebarOverlay(isOpen: $state.showSidebar) {
+                        ChatHistoryView()
+                    }
                 }
+                .gesture(edgeSwipeGesture)
             }
         }
         .onAppear {
@@ -46,15 +50,29 @@ struct ContentView: View {
                 let vehicle = vehicles.first(where: { $0.isActive }) ?? vehicles.first
                 appState.activeVehicle = vehicle
 
-                if let vehicle, appState.navigationPath.isEmpty {
+                if let vehicle, appState.activeSession == nil {
                     let session = ChatSession(title: "New Chat", vehicle: vehicle)
                     modelContext.insert(session)
-                    appState.navigationPath = [session]
+                    appState.activeSession = session
                 }
             } else if appState.activeVehicle == nil {
                 appState.activeVehicle = vehicles.first(where: { $0.isActive }) ?? vehicles.first
             }
         }
+    }
+
+    private var edgeSwipeGesture: some Gesture {
+        DragGesture(minimumDistance: 20)
+            .onEnded { value in
+                // Open sidebar on right-swipe from left edge
+                if value.startLocation.x < 30 &&
+                   value.translation.width > 60 &&
+                   !appState.showSidebar {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        appState.showSidebar = true
+                    }
+                }
+            }
     }
 }
 

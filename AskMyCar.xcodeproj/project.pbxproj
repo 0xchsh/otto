@@ -39,6 +39,7 @@
 		G1A2B3C4D5E6F7A8B9C0D1E2 /* GlassCircleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = G2A3B4C5D6E7F8A9B0C1D2E3 /* GlassCircleButtonStyle.swift */; };
 		H3A4B5C6D7E8F9A0B1C2D3E4 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1A2B3C4D5E6F7A8B9C0D1E2 /* ChatHistoryView.swift */; };
 		I3A4B5C6D7E8F9A0B1C2D3E4 /* ChatHistoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = I1A2B3C4D5E6F7A8B9C0D1E2 /* ChatHistoryRow.swift */; };
+		J3A4B5C6D7E8F9A0B1C2D3E4 /* SidebarOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = J1A2B3C4D5E6F7A8B9C0D1E2 /* SidebarOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +76,7 @@
 		D3E2F1A0B9C8D7E6F5A4B3C2 /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 		H1A2B3C4D5E6F7A8B9C0D1E2 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
 		I1A2B3C4D5E6F7A8B9C0D1E2 /* ChatHistoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryRow.swift; sourceTree = "<group>"; };
+		J1A2B3C4D5E6F7A8B9C0D1E2 /* SidebarOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -124,6 +126,7 @@
 				42F5316B91E1629BB67C1D74 /* ErrorBanner.swift */,
 				G2A3B4C5D6E7F8A9B0C1D2E3 /* GlassCircleButtonStyle.swift */,
 				4869AF465038BE45FED015CB /* LoadingIndicator.swift */,
+				J1A2B3C4D5E6F7A8B9C0D1E2 /* SidebarOverlay.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -324,6 +327,7 @@
 				D2C815DFF01C4E7F4F9231F5 /* View+Keyboard.swift in Sources */,
 				H3A4B5C6D7E8F9A0B1C2D3E4 /* ChatHistoryView.swift in Sources */,
 				I3A4B5C6D7E8F9A0B1C2D3E4 /* ChatHistoryRow.swift in Sources */,
+				J3A4B5C6D7E8F9A0B1C2D3E4 /* SidebarOverlay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
