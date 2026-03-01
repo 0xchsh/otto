@@ -10,6 +10,7 @@ struct AskMyCarApp: App {
             ContentView()
                 .environment(appState)
                 .fontDesign(.rounded)
+                .background(Color.appBackground.ignoresSafeArea())
         }
         .modelContainer(for: [Vehicle.self, ChatSession.self, ChatMessage.self])
     }
@@ -44,7 +45,6 @@ struct ContentView: View {
                     .gesture(sidebarDragGesture(sidebarWidth: sidebarWidth))
                 }
                 .ignoresSafeArea(.keyboard)
-                .background(Color.appBackground.ignoresSafeArea())
             }
         }
         .onAppear {
