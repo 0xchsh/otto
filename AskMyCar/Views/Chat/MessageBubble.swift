@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MessageBubble: View {
     let message: ChatMessage
+    var isStreaming: Bool = false
 
     private var isUser: Bool { message.role == .user }
 
@@ -37,7 +38,7 @@ struct MessageBubble: View {
                 }
 
                 if !message.content.isEmpty {
-                    formattedContent
+                    textContent
                         .padding(12)
                         .background(isUser ? Color.userBubble : Color.assistantBubble)
                         .foregroundStyle(isUser ? .white : Color.appPrimaryText)
@@ -48,6 +49,13 @@ struct MessageBubble: View {
             if !isUser { Spacer(minLength: 60) }
         }
         .padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private var textContent: some View {
+        formattedContent
+            .contentTransition(.interpolate)
+            .animation(isStreaming ? .easeIn(duration: 0.15) : nil, value: message.content)
     }
 }
 

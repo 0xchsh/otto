@@ -26,8 +26,11 @@ struct ChatView: View {
 
                         ForEach(viewModel.messages, id: \.id) { message in
                             if message.role != .system {
-                                MessageBubble(message: message)
-                                    .id(message.id)
+                                MessageBubble(
+                                    message: message,
+                                    isStreaming: viewModel.isStreaming && message.id == viewModel.messages.last?.id
+                                )
+                                .id(message.id)
                             }
                         }
 
@@ -43,7 +46,7 @@ struct ChatView: View {
                     scrollToBottom(proxy: proxy)
                 }
                 .onChange(of: viewModel.messages.last?.content) {
-                    scrollToBottom(proxy: proxy)
+                    scrollToBottom(proxy: proxy, animated: !viewModel.isStreaming)
                 }
             }
 
@@ -263,6 +266,16 @@ struct ChatView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
+        .background(Color(.systemBackground))
+        .background(alignment: .top) {
+            LinearGradient(
+                colors: [Color(.systemBackground), Color(.systemBackground).opacity(0)],
+                startPoint: .bottom,
+                endPoint: .top
+            )
+            .frame(height: 40)
+            .offset(y: -40)
+        }
         .onChange(of: photoPickerItems) { _, newItems in
             Task {
                 for item in newItems {
@@ -295,11 +308,19 @@ struct ChatView: View {
         appState.activeSession = session
     }
 
-    private func scrollToBottom(proxy: ScrollViewProxy) {
+    private func scrollToBottom(proxy: ScrollViewProxy, animated: Bool = true) {
         if viewModel.isLoading {
-            withAnimation { proxy.scrollTo("typing", anchor: .bottom) }
+            if animated {
+                withAnimation { proxy.scrollTo("typing", anchor: .bottom) }
+            } else {
+                proxy.scrollTo("typing", anchor: .bottom)
+            }
         } else if let lastMessage = viewModel.messages.last {
-            withAnimation { proxy.scrollTo(lastMessage.id, anchor: .bottom) }
+            if animated {
+                withAnimation { proxy.scrollTo(lastMessage.id, anchor: .bottom) }
+            } else {
+                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+            }
         }
     }
 }

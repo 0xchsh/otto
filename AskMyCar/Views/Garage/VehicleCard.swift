@@ -16,7 +16,7 @@ struct VehicleCard: View {
                         .resizable()
                         .scaledToFit()
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, -16)
+                        .padding(.top, -16)
                 case .failure:
                     vehicleImagePlaceholder
                 default:
