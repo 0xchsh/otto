@@ -30,11 +30,6 @@ struct GarageView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color.appSecondaryText)
-                            .frame(width: 30, height: 30)
-                            .background(Color.appSecondaryBackground)
-                            .clipShape(Circle())
                     }
                 }
 
@@ -43,11 +38,6 @@ struct GarageView: View {
                         viewModel.showAddVehicle = true
                     } label: {
                         Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 30, height: 30)
-                            .background(Color.appAccent)
-                            .clipShape(Circle())
                     }
                 }
             }

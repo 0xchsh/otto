@@ -127,18 +127,12 @@ struct ChatHistoryView: View {
             Button {
                 showSettings = true
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     Image(systemName: "gearshape.fill")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.appSecondaryText)
-                        .frame(width: 34, height: 34)
-                        .background(Color.appSecondaryBackground)
-                        .clipShape(Circle())
-
                     Text("Settings")
                         .font(.subheadline)
-                        .foregroundStyle(Color.appPrimaryText)
                 }
+                .foregroundStyle(Color.appSecondaryText)
             }
 
             Spacer()
@@ -147,12 +141,8 @@ struct ChatHistoryView: View {
                 createNewSession()
             } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
-                    .background(Color.appAccent)
-                    .clipShape(Circle())
             }
+            .foregroundStyle(Color.appAccent)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 12)

@@ -61,11 +61,6 @@ struct SettingsView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color.appSecondaryText)
-                            .frame(width: 30, height: 30)
-                            .background(Color.appSecondaryBackground)
-                            .clipShape(Circle())
                     }
                 }
             }
