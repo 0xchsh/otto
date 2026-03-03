@@ -133,6 +133,7 @@ struct ChatView: View {
                 Text("Ask anything about your \(vehicle.displayName)")
                     .font(.headline)
                     .multilineTextAlignment(.center)
+                    .padding(.horizontal)
 
                 SuggestedPrompts(prompts: viewModel.suggestedPrompts(for: vehicle)) { prompt in
                     viewModel.inputText = prompt
@@ -140,7 +141,6 @@ struct ChatView: View {
                 }
             }
         }
-        .padding()
     }
 
     private var presetQuestions: [String] {
@@ -282,7 +282,7 @@ struct ChatView: View {
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
-        .background(.bar)
+        .background(.clear)
         .onChange(of: photoPickerItems) { _, newItems in
             Task {
                 for item in newItems {

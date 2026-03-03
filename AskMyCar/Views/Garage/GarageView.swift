@@ -7,17 +7,25 @@ struct GarageView: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \Vehicle.createdAt, order: .reverse) private var vehicles: [Vehicle]
     @State private var viewModel = GarageViewModel()
+    @State private var vehicleToRename: Vehicle?
+    @State private var renameText = ""
 
     var body: some View {
         NavigationStack {
             List {
                 ForEach(vehicles, id: \.id) { vehicle in
-                    Button {
-                        switchToVehicle(vehicle)
-                    } label: {
-                        VehicleCard(vehicle: vehicle)
-                    }
-                    .tint(.primary)
+                    VehicleCard(
+                        vehicle: vehicle,
+                        onRename: {
+                            renameText = vehicle.nickname ?? ""
+                            vehicleToRename = vehicle
+                        },
+                        onDelete: {
+                            viewModel.deleteVehicle(vehicle, in: modelContext, appState: appState)
+                        }
+                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture { switchToVehicle(vehicle) }
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                 }
@@ -53,6 +61,22 @@ struct GarageView: View {
                     )
                 }
             }
+            .task {
+                await fetchMissingPhotos()
+            }
+            .alert("Rename Vehicle", isPresented: Binding(
+                get: { vehicleToRename != nil },
+                set: { if !$0 { vehicleToRename = nil } }
+            )) {
+                TextField("Nickname", text: $renameText)
+                Button("Save") {
+                    vehicleToRename?.nickname = renameText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+                    vehicleToRename = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    vehicleToRename = nil
+                }
+            }
         }
     }
 
@@ -80,6 +104,20 @@ struct GarageView: View {
     private func deleteVehicles(at offsets: IndexSet) {
         for index in offsets {
             viewModel.deleteVehicle(vehicles[index], in: modelContext, appState: appState)
+        }
+    }
+
+    private func fetchMissingPhotos() async {
+        let service = AutoDevService.shared
+        for vehicle in vehicles where vehicle.cachedPhotoURL == nil {
+            if let url = await service.fetchPhotoURL(
+                vin: vehicle.vin,
+                year: vehicle.year,
+                make: vehicle.make,
+                model: vehicle.model
+            ) {
+                vehicle.cachedPhotoURL = url
+            }
         }
     }
 }

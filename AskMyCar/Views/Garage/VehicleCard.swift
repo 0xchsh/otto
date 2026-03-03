@@ -2,25 +2,35 @@ import SwiftUI
 
 struct VehicleCard: View {
     let vehicle: Vehicle
+    var onRename: () -> Void = {}
+    var onDelete: () -> Void = {}
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Vehicle image placeholder
-            ZStack {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(.systemGray5), Color(.systemGray6)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-
-                Image(systemName: "car.side.fill")
-                    .font(.system(size: 64, weight: .thin))
-                    .foregroundStyle(Color(.systemGray3))
+            // Vehicle image
+            if let photoURL = vehicle.cachedPhotoURL, let url = URL(string: photoURL) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(2, contentMode: .fit)
+                            .clipped()
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                    case .failure:
+                        vehicleImagePlaceholder
+                    default:
+                        vehicleImagePlaceholder
+                            .overlay {
+                                ProgressView()
+                            }
+                    }
+                }
+            } else {
+                vehicleImagePlaceholder
             }
-            .aspectRatio(2, contentMode: .fit)
 
             // Vehicle info
             VStack(alignment: .leading, spacing: 6) {
@@ -28,9 +38,22 @@ struct VehicleCard: View {
                     Text(vehicleNickname)
                         .font(.system(size: 18, weight: .semibold))
 
-                    Image(systemName: "ellipsis.message.fill")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.appSecondaryText)
+                    Menu {
+                        Button {
+                            onRename()
+                        } label: {
+                            Label("Rename Vehicle", systemImage: "pencil")
+                        }
+                        Button(role: .destructive) {
+                            onDelete()
+                        } label: {
+                            Label("Delete Vehicle", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color.appSecondaryText)
+                    }
 
                     if vehicle.isActive {
                         Text("Active")
@@ -48,6 +71,24 @@ struct VehicleCard: View {
                     .foregroundStyle(Color.appSecondaryText)
             }
         }
+    }
+
+    private var vehicleImagePlaceholder: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(.systemGray5), Color(.systemGray6)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            Image(systemName: "car.side.fill")
+                .font(.system(size: 64, weight: .thin))
+                .foregroundStyle(Color(.systemGray3))
+        }
+        .aspectRatio(2, contentMode: .fit)
     }
 
     private var vehicleNickname: String {

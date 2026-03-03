@@ -24,6 +24,9 @@ final class Vehicle {
     /// Generated once from vehicle details + API data, then cached.
     var cachedProfileDocument: String?
 
+    /// Cached vehicle photo URL from auto.dev
+    var cachedPhotoURL: String?
+
     @Relationship(deleteRule: .cascade, inverse: \ChatSession.vehicle)
     var sessions: [ChatSession]
 
