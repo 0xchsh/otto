@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 
 enum OnboardingStep {
+    case intro
     case welcome
     case vinEntry
     case makeModelEntry
@@ -11,7 +12,7 @@ enum OnboardingStep {
 @Observable
 @MainActor
 final class OnboardingViewModel {
-    var currentStep: OnboardingStep = .welcome
+    var currentStep: OnboardingStep = .intro
     var vinText = ""
     var make = "" {
         didSet {

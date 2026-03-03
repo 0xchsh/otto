@@ -11,6 +11,8 @@ struct OnboardingView: View {
         NavigationStack {
             Group {
                 switch viewModel.currentStep {
+                case .intro:
+                    introView
                 case .welcome:
                     welcomeView
                 case .vinEntry:
@@ -23,7 +25,7 @@ struct OnboardingView: View {
             }
             .animation(.easeInOut, value: viewModel.currentStep)
             .toolbar {
-                if viewModel.currentStep != .welcome {
+                if viewModel.currentStep != .intro {
                     ToolbarItem(placement: .topBarLeading) {
                         Button("Back") {
                             withAnimation {
@@ -33,6 +35,8 @@ struct OnboardingView: View {
                                     } else {
                                         viewModel.currentStep = .vinEntry
                                     }
+                                } else if viewModel.currentStep == .welcome {
+                                    viewModel.currentStep = .intro
                                 } else {
                                     viewModel.currentStep = .welcome
                                 }
@@ -41,6 +45,60 @@ struct OnboardingView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var introView: some View {
+        VStack(spacing: 32) {
+            Spacer()
+
+            Image(systemName: "car.circle.fill")
+                .font(.system(size: 80))
+                .foregroundStyle(Color.appAccent)
+
+            VStack(spacing: 12) {
+                Text("Welcome to AskMyCar")
+                    .font(.largeTitle.bold())
+                    .multilineTextAlignment(.center)
+
+                Text("Your AI-powered vehicle assistant")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(alignment: .leading, spacing: 16) {
+                featureBullet(icon: "bubble.left.and.text.bubble.right", text: "Ask anything about your car")
+                featureBullet(icon: "wrench.and.screwdriver", text: "Track maintenance schedules")
+                featureBullet(icon: "exclamationmark.triangle", text: "Stay on top of recalls & warranties")
+            }
+            .padding(.horizontal)
+
+            Spacer()
+
+            Button {
+                withAnimation { viewModel.currentStep = .welcome }
+            } label: {
+                Text("Get Started")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.appAccent)
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .padding(.horizontal)
+        }
+        .padding()
+    }
+
+    private func featureBullet(icon: String, text: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(Color.appAccent)
+                .frame(width: 28)
+            Text(text)
+                .font(.body)
         }
     }
 

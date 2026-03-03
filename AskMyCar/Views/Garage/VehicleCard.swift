@@ -4,18 +4,33 @@ struct VehicleCard: View {
     let vehicle: Vehicle
 
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: "car.fill")
-                .font(.title2)
-                .foregroundStyle(Color.appAccent)
-                .frame(width: 44, height: 44)
-                .background(Color.appAccent.opacity(0.15))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+        VStack(alignment: .leading, spacing: 20) {
+            // Vehicle image placeholder
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(.systemGray5), Color(.systemGray6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(vehicle.displayName)
-                        .font(.headline)
+                Image(systemName: "car.side.fill")
+                    .font(.system(size: 64, weight: .thin))
+                    .foregroundStyle(Color(.systemGray3))
+            }
+            .aspectRatio(2, contentMode: .fit)
+
+            // Vehicle info
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Text(vehicleNickname)
+                        .font(.system(size: 18, weight: .semibold))
+
+                    Image(systemName: "ellipsis.message.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.appSecondaryText)
 
                     if vehicle.isActive {
                         Text("Active")
@@ -28,34 +43,19 @@ struct VehicleCard: View {
                     }
                 }
 
-                HStack(spacing: 8) {
-                    if let trim = vehicle.trim {
-                        Text(trim)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    if let vin = vehicle.vin {
-                        Text(maskedVIN(vin))
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                }
+                Text(vehicle.displayName)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(Color.appSecondaryText)
             }
-
-            Spacer()
         }
-        .padding(.vertical, 4)
     }
 
-    private func maskedVIN(_ vin: String) -> String {
-        guard vin.count == 17 else { return vin }
-        let prefix = String(vin.prefix(4))
-        let suffix = String(vin.suffix(4))
-        return "\(prefix)...\(suffix)"
+    private var vehicleNickname: String {
+        vehicle.nickname ?? "\(vehicle.make) \(vehicle.model)"
     }
 }
 
 #Preview {
-    VehicleCard(vehicle: Vehicle(make: "Toyota", model: "Camry", year: 2024, vin: "1HGBH41JXMN109186", trim: "XSE"))
+    VehicleCard(vehicle: Vehicle(make: "Honda", model: "CR-V", year: 2025, nickname: "Hugo"))
+        .padding()
 }

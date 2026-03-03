@@ -18,9 +18,12 @@ struct GarageView: View {
                         VehicleCard(vehicle: vehicle)
                     }
                     .tint(.primary)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                 }
                 .onDelete(perform: deleteVehicles)
             }
+            .listStyle(.plain)
             .navigationTitle("Your Garage")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -40,6 +43,11 @@ struct GarageView: View {
                         viewModel.showAddVehicle = true
                     } label: {
                         Image(systemName: "plus")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 30, height: 30)
+                            .background(Color.appAccent)
+                            .clipShape(Circle())
                     }
                 }
             }
