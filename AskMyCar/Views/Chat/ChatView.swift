@@ -107,9 +107,6 @@ struct ChatView: View {
 
     private var emptyStateView: some View {
         VStack(spacing: 20) {
-            Spacer()
-                .frame(height: 60)
-
             Image(systemName: "car.fill")
                 .font(.system(size: 50))
                 .foregroundStyle(Color.appAccent)
@@ -119,12 +116,11 @@ struct ChatView: View {
                     .font(.headline)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
-
-                SuggestedPrompts(prompts: viewModel.suggestedPrompts(for: vehicle)) { prompt in
-                    viewModel.inputText = prompt
-                    sendMessage()
-                }
             }
+        }
+        .frame(maxWidth: .infinity)
+        .containerRelativeFrame(.vertical) { height, _ in
+            height
         }
     }
 
@@ -215,59 +211,35 @@ struct ChatView: View {
     }
 
     private var inputBar: some View {
-        VStack(spacing: 0) {
-            if viewModel.messages.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(presetQuestions, id: \.self) { question in
-                            Button {
-                                viewModel.inputText = question
-                                sendMessage()
-                            } label: {
-                                Text(question)
-                                    .font(.subheadline)
-                                    .foregroundStyle(Color.appPrimaryText)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 10)
-                                    .background(Color.appSecondaryBackground)
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-                .padding(.vertical, 8)
+        VStack(spacing: 12) {
+            if !viewModel.selectedImages.isEmpty {
+                imageThumbnails
             }
 
-            VStack(spacing: 8) {
-                if !viewModel.selectedImages.isEmpty {
-                    imageThumbnails
-                }
+            TextField(
+                vehicle.map { "Ask about your \($0.make)..." } ?? "Ask about your car...",
+                text: $viewModel.inputText,
+                axis: .vertical
+            )
+            .textFieldStyle(.plain)
+            .lineLimit(1...5)
+            .focused($isInputFocused)
 
-                HStack(alignment: .bottom, spacing: 8) {
-                    attachmentMenu
+            HStack {
+                attachmentMenu
 
-                    TextField(
-                        vehicle.map { "Ask about your \($0.make)..." } ?? "Ask about your car...",
-                        text: $viewModel.inputText,
-                        axis: .vertical
-                    )
-                    .textFieldStyle(.plain)
-                    .lineLimit(1...5)
-                    .focused($isInputFocused)
+                Spacer()
 
-                    sendOrStopButton
-                }
-                .padding(.horizontal, 12)
-                .padding(.bottom, 8)
-                .padding(.top, viewModel.selectedImages.isEmpty ? 8 : 0)
+                sendOrStopButton
             }
-            .background(Color.appSecondaryBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .padding(.horizontal)
-            .padding(.vertical, 8)
         }
-        .background(.clear)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 12)
+        .background(Color.appSecondaryBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .padding(.horizontal)
+        .padding(.vertical, 8)
         .onChange(of: photoPickerItems) { _, newItems in
             Task {
                 for item in newItems {

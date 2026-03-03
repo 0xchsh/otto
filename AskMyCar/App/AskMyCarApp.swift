@@ -38,6 +38,7 @@ struct ContentView: View {
                         // Sidebar — sits behind, revealed when main content pushes right
                         ChatHistoryView()
                             .frame(width: sidebarWidth)
+                            .background(Color.appBackground.ignoresSafeArea())
 
                         // Main content — pushes right when sidebar opens
                         mainContent(geo: geo, sidebarWidth: sidebarWidth)
@@ -88,12 +89,17 @@ struct ContentView: View {
             ChatView()
         }
         .frame(width: geo.size.width)
-        .clipShape(RoundedRectangle(cornerRadius: isOpen ? 20 : 0, style: .continuous))
+        .background(Color.appBackground.ignoresSafeArea())
+        .mask {
+            RoundedRectangle(cornerRadius: 40, style: .continuous)
+                .ignoresSafeArea()
+        }
         .shadow(color: .black.opacity(isOpen ? 0.15 : 0), radius: 10, x: -3)
         .overlay {
             if isOpen {
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                RoundedRectangle(cornerRadius: 40, style: .continuous)
                     .fill(Color.black.opacity(0.04))
+                    .ignoresSafeArea()
                     .allowsHitTesting(true)
                     .onTapGesture {
                         withAnimation(springAnimation) {

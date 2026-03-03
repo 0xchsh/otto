@@ -5,48 +5,30 @@ struct OnboardingView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Query(sort: \Vehicle.createdAt) private var vehicles: [Vehicle]
     @State private var viewModel = OnboardingViewModel()
+    @State private var showIntro = true
+    @State private var showMakePicker = false
+    @State private var showModelPicker = false
+
+    private var isFirstVehicle: Bool { vehicles.isEmpty }
 
     var body: some View {
         NavigationStack {
             Group {
-                switch viewModel.currentStep {
-                case .intro:
+                if isFirstVehicle && showIntro {
                     introView
-                case .welcome:
-                    welcomeView
-                case .vinEntry:
-                    VINEntryView(viewModel: viewModel)
-                case .makeModelEntry:
-                    MakeModelEntryView(viewModel: viewModel)
-                case .confirmation:
-                    confirmationView
+                        .transition(.move(edge: .leading))
+                } else {
+                    addVehicleView
+                        .transition(.move(edge: .trailing))
                 }
             }
-            .animation(.easeInOut, value: viewModel.currentStep)
-            .toolbar {
-                if viewModel.currentStep != .intro {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("Back") {
-                            withAnimation {
-                                if viewModel.currentStep == .confirmation {
-                                    if viewModel.vinText.isEmpty {
-                                        viewModel.currentStep = .makeModelEntry
-                                    } else {
-                                        viewModel.currentStep = .vinEntry
-                                    }
-                                } else if viewModel.currentStep == .welcome {
-                                    viewModel.currentStep = .intro
-                                } else {
-                                    viewModel.currentStep = .welcome
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            .animation(.easeInOut(duration: 0.3), value: showIntro)
         }
     }
+
+    // MARK: - Intro
 
     private var introView: some View {
         VStack(spacing: 32) {
@@ -76,7 +58,7 @@ struct OnboardingView: View {
             Spacer()
 
             Button {
-                withAnimation { viewModel.currentStep = .welcome }
+                withAnimation { showIntro = false }
             } label: {
                 Text("Get Started")
                     .font(.headline)
@@ -102,122 +84,201 @@ struct OnboardingView: View {
         }
     }
 
-    private var welcomeView: some View {
-        VStack(spacing: 32) {
-            Spacer()
+    // MARK: - Add Vehicle
 
-            Image(systemName: "car.circle.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(Color.appAccent)
-
-            VStack(spacing: 12) {
-                Text("AskMyCar")
-                    .font(.largeTitle.bold())
-
-                Text("Your AI-powered vehicle assistant")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-            }
-
-            VStack(spacing: 16) {
-                Button {
-                    withAnimation { viewModel.currentStep = .vinEntry }
-                } label: {
-                    Label("Enter VIN", systemImage: "barcode.viewfinder")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.appAccent)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
-                Button {
-                    withAnimation { viewModel.currentStep = .makeModelEntry }
-                } label: {
-                    Label("Enter Make & Model", systemImage: "pencil.line")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.appSecondaryBackground)
-                        .foregroundStyle(Color.appPrimaryText)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+    private var addVehicleView: some View {
+        VStack(spacing: 0) {
+            Picker("Input Mode", selection: $viewModel.inputMode) {
+                ForEach(VehicleInputMode.allCases, id: \.self) { mode in
+                    Text(mode.rawValue).tag(mode)
                 }
             }
-            .padding(.horizontal)
+            .pickerStyle(.segmented)
+            .padding()
 
-            Spacer()
+            ScrollView {
+                VStack(spacing: 16) {
+                    switch viewModel.inputMode {
+                    case .vin:
+                        vinContent
+                    case .ymm:
+                        ymmContent
+                    }
+
+                    nicknameField
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+
+            addButton
+                .padding()
         }
-        .padding()
+        .navigationTitle("Add Vehicle")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if !isFirstVehicle {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showMakePicker) {
+            SearchablePickerSheet(
+                title: "Select Make",
+                items: VehicleData.makes,
+                selection: $viewModel.make
+            )
+        }
+        .sheet(isPresented: $showModelPicker) {
+            SearchablePickerSheet(
+                title: "Select Model",
+                items: VehicleData.models(for: viewModel.make),
+                selection: $viewModel.model
+            )
+        }
     }
 
-    private var confirmationView: some View {
-        VStack(spacing: 24) {
-            Spacer()
+    // MARK: - VIN Content
 
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(.green)
+    private var vinContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Your Vehicle Identification Number is a 17-character code found on your dashboard or door jamb.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
 
-            Text("Vehicle Ready")
-                .font(.title2.bold())
-
-            VStack(spacing: 8) {
-                if !viewModel.make.isEmpty {
-                    infoRow(label: "Year", value: String(viewModel.year))
-                    infoRow(label: "Make", value: viewModel.make)
-                    infoRow(label: "Model", value: viewModel.model)
-                    if !viewModel.trim.isEmpty {
-                        infoRow(label: "Trim", value: viewModel.trim)
+            VStack(alignment: .trailing, spacing: 8) {
+                TextField("e.g. 1HGBH41JXMN109186", text: $viewModel.vinText)
+                    .font(.system(.body, design: .monospaced))
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .padding()
+                    .background(Color.appSecondaryBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .onChange(of: viewModel.vinText) { _, newValue in
+                        viewModel.vinText = viewModel.filterVINInput(newValue)
                     }
-                    if !viewModel.nickname.trimmingCharacters(in: .whitespaces).isEmpty {
-                        infoRow(label: "Nickname", value: viewModel.nickname)
+
+                HStack {
+                    if let error = viewModel.vinError {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundStyle(.red)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+
+                    Spacer()
+
+                    Text("\(viewModel.vinText.count)/17")
+                        .font(.caption)
+                        .foregroundStyle(viewModel.vinText.count == 17 ? .green : .secondary)
+                }
+            }
+        }
+    }
+
+    // MARK: - YMM Content
+
+    private var ymmContent: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Text("Year")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Picker("Year", selection: $viewModel.year) {
+                    ForEach(yearRange, id: \.self) { year in
+                        Text(String(year)).tag(year)
                     }
                 }
-
-                if let info = viewModel.decodedVINInfo {
-                    infoRow(label: "VIN", value: info.vin)
-                    infoRow(label: "Country", value: info.countryOfOrigin)
-                    infoRow(label: "Model Year", value: info.modelYear)
-                }
+                .pickerStyle(.menu)
             }
             .padding()
             .background(Color.appSecondaryBackground)
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
-            Spacer()
-
-            Button {
-                let vehicle = viewModel.createVehicle(in: modelContext)
-                appState.activeVehicle = vehicle
-
-                // Create a new chat session for this vehicle
-                let session = ChatSession(title: "New Chat", vehicle: vehicle)
-                modelContext.insert(session)
-                appState.activeSession = session
-
-                // Dismiss sheets (garage + onboarding) when adding from garage
-                appState.showGarage = false
-                dismiss()
-            } label: {
-                Text("Start Chatting")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.appAccent)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            Button { showMakePicker = true } label: {
+                HStack {
+                    Text(viewModel.make.isEmpty ? "Make (e.g. Toyota)" : viewModel.make)
+                        .foregroundStyle(viewModel.make.isEmpty ? .secondary : .primary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .background(Color.appSecondaryBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(.horizontal)
+
+            Button { showModelPicker = true } label: {
+                HStack {
+                    Text(viewModel.model.isEmpty ? "Model (e.g. Camry)" : viewModel.model)
+                        .foregroundStyle(viewModel.model.isEmpty ? .secondary : .primary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .background(Color.appSecondaryBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .disabled(viewModel.make.isEmpty)
+            .opacity(viewModel.make.isEmpty ? 0.5 : 1)
+
+            TextField("Trim (optional, e.g. XSE)", text: $viewModel.trim)
+                .textInputAutocapitalization(.characters)
+                .padding()
+                .background(Color.appSecondaryBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .padding()
     }
 
-    private func infoRow(label: String, value: String) -> some View {
-        HStack {
-            Text(label)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .fontWeight(.medium)
+    // MARK: - Nickname
+
+    private var nicknameField: some View {
+        TextField("Nickname (optional, e.g. Hugo)", text: $viewModel.nickname)
+            .textInputAutocapitalization(.words)
+            .padding()
+            .background(Color.appSecondaryBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    // MARK: - Add Button
+
+    private var addButton: some View {
+        Button {
+            Task {
+                let success = await viewModel.addVehicle(in: modelContext, appState: appState)
+                if success {
+                    appState.showGarage = false
+                    dismiss()
+                }
+            }
+        } label: {
+            HStack {
+                if viewModel.isDecodingVIN && viewModel.inputMode == .vin {
+                    ProgressView().tint(.white)
+                }
+                Image(systemName: "plus")
+                Text("Add a vehicle")
+            }
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(viewModel.canAdd ? Color.appAccent : Color.gray)
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
+        .disabled(!viewModel.canAdd)
+    }
+
+    private var yearRange: [Int] {
+        let currentYear = Calendar.current.component(.year, from: Date())
+        return Array(stride(from: currentYear + 1, through: 1980, by: -1))
     }
 }
 

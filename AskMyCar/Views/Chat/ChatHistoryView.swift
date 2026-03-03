@@ -136,13 +136,6 @@ struct ChatHistoryView: View {
             }
 
             Spacer()
-
-            Button {
-                createNewSession()
-            } label: {
-                Image(systemName: "plus")
-            }
-            .foregroundStyle(Color.appAccent)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 12)

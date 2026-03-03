@@ -16,6 +16,7 @@
 		55FB1ECA4CE44FBE4F7321AF /* SuggestedPrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE7F0E6E9CA3009C120BE0F /* SuggestedPrompts.swift */; };
 		57CDB2F6B6FB9B52047A41FB /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B487DA125941D3CE9A474F72 /* AIService.swift */; };
 		AD01234567890ABCDEF01234 /* AutoDevService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD11234567890ABCDEF01234 /* AutoDevService.swift */; };
+		NH01234567890ABCDEF01234 /* NHTSAService.swift in Sources */ = {isa = PBXBuildFile; fileRef = NH11234567890ABCDEF01234 /* NHTSAService.swift */; };
 		61F290FE41A2BD6EBBA2CC37 /* VehicleAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C2DE58906601A579A47939 /* VehicleAPIService.swift */; };
 		646E7EF849BCC1E90D2E3CB8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73BDDD3D46AF27EB4019370 /* OnboardingView.swift */; };
 		683F83CA196FC8A220951426 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23B1F156B6D684FA2D959A0 /* KeychainService.swift */; };
@@ -47,6 +48,7 @@
 /* Begin PBXFileReference section */
 		054D26F41D28FFED993B035A /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
 		AD11234567890ABCDEF01234 /* AutoDevService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoDevService.swift; sourceTree = "<group>"; };
+		NH11234567890ABCDEF01234 /* NHTSAService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NHTSAService.swift; sourceTree = "<group>"; };
 		064AB556B08DC90E8C0B2916 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		10F0547DA3A86BDF9F2BAF6E /* GarageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageViewModel.swift; sourceTree = "<group>"; };
 		145F23119D5FDEDD4DA73D62 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				B487DA125941D3CE9A474F72 /* AIService.swift */,
 				AD11234567890ABCDEF01234 /* AutoDevService.swift */,
 				C23B1F156B6D684FA2D959A0 /* KeychainService.swift */,
+				NH11234567890ABCDEF01234 /* NHTSAService.swift */,
 				55C2DE58906601A579A47939 /* VehicleAPIService.swift */,
 				FA2CE2A567342286545B1ACD /* VINDecoderService.swift */,
 			);
@@ -319,6 +322,7 @@
 				683F83CA196FC8A220951426 /* KeychainService.swift in Sources */,
 				CAFD3DB86D245B072702F156 /* LoadingIndicator.swift in Sources */,
 				DC9D13991980859E022763DD /* MakeModelEntryView.swift in Sources */,
+				NH01234567890ABCDEF01234 /* NHTSAService.swift in Sources */,
 				295A841C02235F70E786795C /* MessageBubble.swift in Sources */,
 				646E7EF849BCC1E90D2E3CB8 /* OnboardingView.swift in Sources */,
 				9612E7AA26389EFADA8EBB89 /* OnboardingViewModel.swift in Sources */,

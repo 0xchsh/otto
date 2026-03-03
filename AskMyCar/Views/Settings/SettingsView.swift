@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var modelName = ""
     @State private var vehicleAPIKey = ""
     @State private var showDeleteConfirmation = false
+    @State private var showClearHistoryConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -50,8 +51,28 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Button("Clear Chat History", role: .destructive) {
+                        showClearHistoryConfirmation = true
+                    }
+                    .confirmationDialog("Clear Chat History", isPresented: $showClearHistoryConfirmation, titleVisibility: .visible) {
+                        Button("Clear All Chats", role: .destructive) {
+                            clearChatHistory()
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("This will delete all chat sessions and messages. Your vehicles will be kept.")
+                    }
+
                     Button("Delete All Data", role: .destructive) {
                         showDeleteConfirmation = true
+                    }
+                    .confirmationDialog("Delete All Data", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
+                        Button("Delete Everything", role: .destructive) {
+                            deleteAllData()
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("This will permanently delete all vehicles, chat sessions, and messages. This cannot be undone.")
                     }
                 }
             }
@@ -63,14 +84,6 @@ struct SettingsView: View {
                         Image(systemName: "xmark")
                     }
                 }
-            }
-            .confirmationDialog("Delete All Data", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
-                Button("Delete Everything", role: .destructive) {
-                    deleteAllData()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will permanently delete all vehicles, chat sessions, and messages. This cannot be undone.")
             }
             .onAppear {
                 loadSettings()
@@ -100,6 +113,15 @@ struct SettingsView: View {
 
         UserDefaults.standard.set(baseURL, forKey: AIService.baseURLKey)
         UserDefaults.standard.set(modelName, forKey: AIService.modelKey)
+    }
+
+    private func clearChatHistory() {
+        do {
+            try modelContext.delete(model: ChatMessage.self)
+            try modelContext.delete(model: ChatSession.self)
+        } catch {
+            // Deletion failed silently
+        }
     }
 
     private func deleteAllData() {

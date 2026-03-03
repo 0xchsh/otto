@@ -30,17 +30,24 @@ final class Vehicle {
     @Relationship(deleteRule: .cascade, inverse: \ChatSession.vehicle)
     var sessions: [ChatSession]
 
+    var formattedMake: String {
+        make.capitalized
+    }
+
     var topBarName: String {
-        nickname ?? make
+        if let nickname, !nickname.isEmpty { return nickname }
+        if !make.isEmpty { return formattedMake }
+        return "My Vehicle"
     }
 
     var displayName: String {
-        "\(year) \(make) \(model)"
+        let parts = [String(year), formattedMake, model].filter { !$0.isEmpty }
+        return parts.joined(separator: " ")
     }
 
     var fullDisplayName: String {
         if let trim {
-            return "\(year) \(make) \(model) \(trim)"
+            return "\(year) \(formattedMake) \(model) \(trim)"
         }
         return displayName
     }

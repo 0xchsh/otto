@@ -8,6 +8,7 @@ struct GarageView: View {
     @Query(sort: \Vehicle.createdAt, order: .reverse) private var vehicles: [Vehicle]
     @State private var viewModel = GarageViewModel()
     @State private var vehicleToRename: Vehicle?
+    @State private var vehicleToDelete: Vehicle?
     @State private var renameText = ""
 
     var body: some View {
@@ -16,18 +17,19 @@ struct GarageView: View {
                 ForEach(vehicles, id: \.id) { vehicle in
                     VehicleCard(
                         vehicle: vehicle,
+                        onChat: { startNewChat(with: vehicle) },
                         onRename: {
                             renameText = vehicle.nickname ?? ""
                             vehicleToRename = vehicle
                         },
                         onDelete: {
-                            viewModel.deleteVehicle(vehicle, in: modelContext, appState: appState)
+                            vehicleToDelete = vehicle
                         }
                     )
                     .contentShape(Rectangle())
                     .onTapGesture { switchToVehicle(vehicle) }
                     .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                 }
                 .onDelete(perform: deleteVehicles)
             }
@@ -74,6 +76,26 @@ struct GarageView: View {
                     vehicleToRename = nil
                 }
             }
+            .confirmationDialog(
+                "Delete \(vehicleToDelete?.topBarName ?? "Vehicle")?",
+                isPresented: Binding(
+                    get: { vehicleToDelete != nil },
+                    set: { if !$0 { vehicleToDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete Vehicle", role: .destructive) {
+                    if let vehicle = vehicleToDelete {
+                        viewModel.deleteVehicle(vehicle, in: modelContext, appState: appState)
+                    }
+                    vehicleToDelete = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    vehicleToDelete = nil
+                }
+            } message: {
+                Text("Are you sure? All of your chats tied to this vehicle will be deleted.")
+            }
         }
     }
 
@@ -98,9 +120,21 @@ struct GarageView: View {
         dismiss()
     }
 
+    private func startNewChat(with vehicle: Vehicle) {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+
+        viewModel.setActiveVehicle(vehicle, allVehicles: vehicles, appState: appState)
+
+        let session = ChatSession(title: "New Chat", vehicle: vehicle)
+        modelContext.insert(session)
+        appState.activeSession = session
+        dismiss()
+    }
+
     private func deleteVehicles(at offsets: IndexSet) {
-        for index in offsets {
-            viewModel.deleteVehicle(vehicles[index], in: modelContext, appState: appState)
+        if let index = offsets.first {
+            vehicleToDelete = vehicles[index]
         }
     }
 
