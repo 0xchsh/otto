@@ -144,7 +144,7 @@ struct OnboardingView: View {
     // MARK: - VIN Content
 
     private var vinContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Your Vehicle Identification Number is a 17-character code found on your dashboard or door jamb.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -171,10 +171,6 @@ struct OnboardingView: View {
                     }
 
                     Spacer()
-
-                    Text("\(viewModel.vinText.count)/17")
-                        .font(.caption)
-                        .foregroundStyle(viewModel.vinText.count == 17 ? .green : .secondary)
                 }
             }
         }
@@ -196,6 +192,7 @@ struct OnboardingView: View {
                 .pickerStyle(.menu)
             }
             .padding()
+            .frame(minHeight: 50)
             .background(Color.appSecondaryBackground)
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
