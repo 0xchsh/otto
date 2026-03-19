@@ -84,25 +84,9 @@ actor VehicleImageService {
 
     // MARK: - Public
 
-    /// Fetches a signed CDN image URL for the vehicle, resolving brand/model/variant/trim as needed.
-    func fetchImageURL(for vehicle: Vehicle, color: String? = nil, view: String = "right") async throws -> URL {
-        let colorParam = color ?? vehicle.exteriorColor ?? "default"
-        let cacheKey = "\(vehicle.id):\(view):\(colorParam)"
-
-        // Check in-memory URL cache first (survives SwiftUI view recreation)
-        if let cached = urlCache[cacheKey] { return cached }
-
-        // Check persisted per-view cache
-        if let cached = vehicle.cachedImageURL(for: view),
-           let url = URL(string: cached),
-           color == nil || color == vehicle.exteriorColor {
-            urlCache[cacheKey] = url
-            return url
-        }
-
-        guard let apiKey else { throw VehicleImageError.noAPIKey }
-
-        // Resolve API names (cached per vehicle ID to avoid repeated lookups)
+    /// Resolves API brand/model/year/variant/trim for a vehicle, caching results.
+    private func resolveVehicle(_ vehicle: Vehicle, apiKey: String) async throws -> (brand: String, model: String, year: Int, variant: String, trim: String) {
+        // Resolve API names (cached per vehicle ID)
         let apiBrand: String
         let apiModel: String
         let apiYear: Int
@@ -118,7 +102,7 @@ actor VehicleImageService {
             resolvedNames[vehicle.id] = (apiBrand, apiModel, apiYear)
         }
 
-        // Step 4: Resolve variant + trim
+        // Resolve variant + trim
         let variant: String
         let trim: String
 
@@ -129,7 +113,6 @@ actor VehicleImageService {
             let encodedBrand = encodePathComponent(apiBrand)
             let encodedModel = encodePathComponent(apiModel)
 
-            // Discover variants
             let variantsURL = try buildURL(path: "/\(encodedBrand)/\(encodedModel)/\(apiYear)")
             let variantsData = try await performRequest(url: variantsURL, apiKey: apiKey)
             let variantsArray = try JSONDecoder().decode([VariantsResponse].self, from: variantsData)
@@ -145,7 +128,6 @@ actor VehicleImageService {
                 pickedVariant = variants[0]
             }
 
-            // Discover trims
             let encodedVariant = encodePathComponent(pickedVariant)
             let trimsURL = try buildURL(path: "/\(encodedBrand)/\(encodedModel)/\(apiYear)/\(encodedVariant)")
             let trimsData = try await performRequest(url: trimsURL, apiKey: apiKey)
@@ -171,13 +153,36 @@ actor VehicleImageService {
             }
         }
 
-        // Step 5: Fetch the image
-        let encodedBrand = encodePathComponent(apiBrand)
-        let encodedModel = encodePathComponent(apiModel)
-        let encodedVariant = encodePathComponent(variant)
-        let encodedTrim = encodePathComponent(trim)
+        return (apiBrand, apiModel, apiYear, variant, trim)
+    }
+
+    /// Fetches a signed CDN image URL for the vehicle, resolving brand/model/variant/trim as needed.
+    func fetchImageURL(for vehicle: Vehicle, color: String? = nil, view: String = "right") async throws -> URL {
+        let colorParam = color ?? vehicle.exteriorColor ?? "default"
+        let cacheKey = "\(vehicle.id):\(view):\(colorParam)"
+
+        // Check in-memory URL cache first (survives SwiftUI view recreation)
+        if let cached = urlCache[cacheKey] { return cached }
+
+        // Check persisted per-view cache
+        if let cached = vehicle.cachedImageURL(for: view),
+           let url = URL(string: cached),
+           color == nil || color == vehicle.exteriorColor {
+            urlCache[cacheKey] = url
+            return url
+        }
+
+        guard let apiKey else { throw VehicleImageError.noAPIKey }
+
+        let resolved = try await resolveVehicle(vehicle, apiKey: apiKey)
+
+        // Fetch the image
+        let encodedBrand = encodePathComponent(resolved.brand)
+        let encodedModel = encodePathComponent(resolved.model)
+        let encodedVariant = encodePathComponent(resolved.variant)
+        let encodedTrim = encodePathComponent(resolved.trim)
         let encodedColor = colorParam.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? colorParam
-        let imagePath = "/\(encodedBrand)/\(encodedModel)/\(apiYear)/\(encodedVariant)/\(encodedTrim)/\(view)?color=\(encodedColor)&transparency=true"
+        let imagePath = "/\(encodedBrand)/\(encodedModel)/\(resolved.year)/\(encodedVariant)/\(encodedTrim)/\(view)?color=\(encodedColor)&transparency=true"
         let imageURL = try buildURL(path: imagePath)
         let imageData = try await performRequest(url: imageURL, apiKey: apiKey)
         let imageArray = try JSONDecoder().decode([ImageResponse].self, from: imageData)
@@ -201,14 +206,13 @@ actor VehicleImageService {
     func fetchAvailableColors(for vehicle: Vehicle) async throws -> [String] {
         guard let apiKey else { throw VehicleImageError.noAPIKey }
 
-        let apiBrand = try await resolveBrand(vehicle.make, apiKey: apiKey)
-        let apiModel = try await resolveModel(vehicle.model, brand: apiBrand, apiKey: apiKey)
-        let variant = encodePathComponent(vehicle.resolvedVariant ?? "default")
-        let trim = encodePathComponent(vehicle.resolvedTrim ?? "default")
-        let encodedBrand = encodePathComponent(apiBrand)
-        let encodedModel = encodePathComponent(apiModel)
+        let resolved = try await resolveVehicle(vehicle, apiKey: apiKey)
+        let encodedBrand = encodePathComponent(resolved.brand)
+        let encodedModel = encodePathComponent(resolved.model)
+        let encodedVariant = encodePathComponent(resolved.variant)
+        let encodedTrim = encodePathComponent(resolved.trim)
 
-        let url = try buildURL(path: "/\(encodedBrand)/\(encodedModel)/\(vehicle.year)/\(variant)/\(trim)/colors")
+        let url = try buildURL(path: "/\(encodedBrand)/\(encodedModel)/\(resolved.year)/\(encodedVariant)/\(encodedTrim)/colors")
         let data = try await performRequest(url: url, apiKey: apiKey)
         let response = try JSONDecoder().decode([ColorsResponse].self, from: data)
         return response.first?.colors ?? []

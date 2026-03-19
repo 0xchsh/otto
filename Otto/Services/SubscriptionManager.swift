@@ -12,8 +12,8 @@ final class SubscriptionManager: Sendable {
 
     var shouldShowPaywall = false
 
-    static let monthlyID = "com.otto.app.monthly"
-    static let yearlyID = "com.otto.app.yearly"
+    static let monthlyID = "ch.sh.otto.monthly"
+    static let yearlyID = "ch.sh.otto.yearly"
     private static let productIDs: Set<String> = [monthlyID, yearlyID]
 
     var monthlyProduct: Product? { products[Self.monthlyID] }

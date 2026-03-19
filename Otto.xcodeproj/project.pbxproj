@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -41,15 +41,15 @@
 		A8EF2A4ED8E1B9EEA83E366D /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78913542A764DA5DFF009082 /* MessageBubble.swift */; };
 		AB3C82F9CF9811928AA0F358 /* VehicleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579860B8FC01571716D3E827 /* VehicleData.swift */; };
 		AD9595E1A03D1714EE578798 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C0577A20EC4907E3B462A84 /* ChatViewModel.swift */; };
-		E4F92C6B7A8D30E1F5C46B89 /* VehicleImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E3D41A92F6C8E50D1BA723 /* VehicleImageService.swift */; };
-		F6D83A2E41B9C5F07E2A8D53 /* VehicleAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A1F85D63E4B7C2A0D5E416 /* VehicleAsyncImage.swift */; };
 		C3405B449EAF5537C73C5F64 /* ErrorBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C2656EA3B7530231FC9029 /* ErrorBanner.swift */; };
 		C576A7A81E557C696A8B980A /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425598F4C2F4161F5B229FEE /* KeychainService.swift */; };
 		CFE743689681BE7B02042E33 /* VINDecoderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F2A36EBC0C27A5F040633E1 /* VINDecoderService.swift */; };
 		D0CAE7C42956AF2DBF7387B7 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71A597A68AAE91780AF8E49 /* AIService.swift */; };
 		D1555C216B839B8525FAF7D3 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D52A91FC0CA34B6A721B4D /* SettingsView.swift */; };
 		DD4BA3B94181D1D3EDE23519 /* ChatHistoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1DA029B561397FCE86873F5 /* ChatHistoryRow.swift */; };
+		E4F92C6B7A8D30E1F5C46B89 /* VehicleImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E3D41A92F6C8E50D1BA723 /* VehicleImageService.swift */; };
 		F64A1CCE163E6919CE596527 /* MakeModelEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F56F5EA989E53FF0D5308BEA /* MakeModelEntryView.swift */; };
+		F6D83A2E41B9C5F07E2A8D53 /* VehicleAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A1F85D63E4B7C2A0D5E416 /* VehicleAsyncImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,19 +61,20 @@
 		2F2A36EBC0C27A5F040633E1 /* VINDecoderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VINDecoderService.swift; sourceTree = "<group>"; };
 		3225CA99E1D06138C214385F /* NHTSAService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NHTSAService.swift; sourceTree = "<group>"; };
 		35E765E490CD50CAA5467C93 /* ChatSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSession.swift; sourceTree = "<group>"; };
-		380D40D07EDFB0D5DB49AD3F /* Otto.storekit */ = {isa = PBXFileReference; path = Otto.storekit; sourceTree = "<group>"; };
+		380D40D07EDFB0D5DB49AD3F /* Otto.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Otto.storekit; sourceTree = "<group>"; };
 		389597EA41F1731BA6A4CE5D /* SidebarOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarOverlay.swift; sourceTree = "<group>"; };
 		3E237AF6157CD18E5E1CFB49 /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
 		4020181ABD40B0EC48AF6BBC /* OttoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OttoApp.swift; sourceTree = "<group>"; };
 		42001FD34007D17C6C334207 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
 		425598F4C2F4161F5B229FEE /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		4B52B8D00012E66FF3FC003F /* View+Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Keyboard.swift"; sourceTree = "<group>"; };
-		4B58CAEE160499AF457BC643 /* Otto.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Otto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B58CAEE160499AF457BC643 /* Otto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Otto.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BD5BB4FF4EE014B3C66886B /* GlassCircleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCircleButtonStyle.swift; sourceTree = "<group>"; };
 		4CDA0B0BB8F4B6FA656E8EAA /* VehicleCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleCard.swift; sourceTree = "<group>"; };
 		4F41DD9144771FF76C382D6C /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Secrets.plist; sourceTree = "<group>"; };
 		579860B8FC01571716D3E827 /* VehicleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleData.swift; sourceTree = "<group>"; };
 		583815E5DA560957F044D196 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		5D2E8A4C61F7B3D9C0E24A17 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		5F9F7BAD635B28997FB9DE49 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
 		64A29D7595C8DBA6AED33969 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		668CA26D067D03D561BB0B0A /* SuggestedPrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestedPrompts.swift; sourceTree = "<group>"; };
@@ -81,7 +82,6 @@
 		7349D50714C33CC701B237B5 /* LoadingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingIndicator.swift; sourceTree = "<group>"; };
 		78913542A764DA5DFF009082 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
 		7D84478638370F3BF4C93044 /* Otto.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Otto.entitlements; sourceTree = "<group>"; };
-		5D2E8A4C61F7B3D9C0E24A17 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		80CCB94FB5A4C04763CEEAFC /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		8D80EE0217209DBD2AA36278 /* VehicleAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleAPIService.swift; sourceTree = "<group>"; };
 		9B7DDC19E503A6E0921EE4FF /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
@@ -312,7 +312,6 @@
 			);
 			mainGroup = 801FD039A055CFF047A9071D;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -393,7 +392,10 @@
 				CODE_SIGN_ENTITLEMENTS = Otto/Otto.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9TCQHA4XGY;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Otto uses your camera to photograph your vehicle or parts for AI assistance.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Otto uses your photo library to attach images of your vehicle to chat.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -403,7 +405,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.otto.app;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.sh.otto;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -421,7 +423,10 @@
 				CODE_SIGN_ENTITLEMENTS = Otto/Otto.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9TCQHA4XGY;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Otto uses your camera to photograph your vehicle or parts for AI assistance.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Otto uses your photo library to attach images of your vehicle to chat.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -431,7 +436,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.otto.app;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.sh.otto;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

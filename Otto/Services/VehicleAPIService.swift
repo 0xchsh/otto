@@ -165,7 +165,6 @@ struct VehicleContext {
 actor VehicleAPIService {
     static let apiKeyKeychainKey = "vehicle_api_key"
     private let baseURL = "https://api.vehicledatabases.com"
-    private let defaultAPIKey = "ffce7698afcb11f0ac810242ac120002"
     private let session: URLSession
     private let supabase = SupabaseService()
 
@@ -173,8 +172,19 @@ actor VehicleAPIService {
         self.session = session
     }
 
-    private var apiKey: String {
-        KeychainService.load(key: VehicleAPIService.apiKeyKeychainKey) ?? defaultAPIKey
+    private var apiKey: String? {
+        // User-provided key takes priority, then fall back to bundled Secrets.plist
+        if let keychainKey = KeychainService.load(key: VehicleAPIService.apiKeyKeychainKey) {
+            return keychainKey
+        }
+        if let url = Bundle.main.url(forResource: "Secrets", withExtension: "plist"),
+           let data = try? Data(contentsOf: url),
+           let dict = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+           let key = dict["VEHICLE_DATABASES_API_KEY"] as? String,
+           !key.isEmpty {
+            return key
+        }
+        return nil
     }
 
     func fetchVehicleContext(vin: String?, year: Int, make: String, model: String) async -> VehicleContext {
@@ -277,6 +287,7 @@ actor VehicleAPIService {
     }
 
     private func performRequest(url: URL) async throws -> Data {
+        guard let apiKey else { throw VehicleAPIError.noData }
         var request = URLRequest(url: url)
         request.setValue(apiKey, forHTTPHeaderField: "x-authkey")
 

@@ -8,7 +8,7 @@
   ],
   "settings" : {
     "_applicationInternalID" : "1234567890",
-    "_developerTeamID" : "XXXXXXXXXX",
+    "_developerTeamID" : "9TCQHA4XGY",
     "_failTransactionsEnabled" : false,
     "_locale" : "en_US",
     "_storefront" : "USA",
@@ -96,7 +96,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.otto.app.monthly",
+          "productID" : "ch.sh.otto.monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Otto Monthly",
           "subscriptionGroupID" : "D3A1B5C7-9E2F-4D6A-8B0C-1E3F5A7B9D2E",
@@ -129,7 +129,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.otto.app.yearly",
+          "productID" : "ch.sh.otto.yearly",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Otto Yearly",
           "subscriptionGroupID" : "D3A1B5C7-9E2F-4D6A-8B0C-1E3F5A7B9D2E",

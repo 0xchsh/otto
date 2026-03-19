@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 enum KeychainService {
-    private static let serviceName = "com.askmycar.app"
+    private static let serviceName = "ch.sh.otto"
 
     static func save(key: String, value: String) {
         guard let data = value.data(using: .utf8) else { return }

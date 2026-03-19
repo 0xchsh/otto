@@ -154,7 +154,7 @@ struct SettingsView: View {
             }
             dismiss()
         } catch {
-            print("Clear chat history failed: \(error)")
+            // Silently handled — user can retry
         }
     }
 
@@ -168,7 +168,7 @@ struct SettingsView: View {
             appState.activeVehicle = nil
             dismiss()
         } catch {
-            print("Delete all data failed: \(error)")
+            // Silently handled — user can retry
         }
     }
 }
